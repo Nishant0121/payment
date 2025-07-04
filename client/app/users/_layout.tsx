@@ -1,6 +1,8 @@
 import { Tabs } from "expo-router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Platform } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
 
 import { HapticTab } from "@/components/HapticTab";
 import { IconSymbol } from "@/components/ui/IconSymbol";
@@ -11,6 +13,18 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const storedUser = await AsyncStorage.getItem("user");
+      const user = storedUser ? JSON.parse(storedUser) : null;
+      setUserRole(user?.role ?? null);
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <Tabs
       screenOptions={{
@@ -20,7 +34,6 @@ export default function TabLayout() {
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
           ios: {
-            // Use a transparent background on iOS to show the blur effect
             position: "absolute",
           },
           default: {},
@@ -28,18 +41,27 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="dashboard"
         options={{
-          title: "Home",
+          title: "Dashboard",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="house.fill" color={color} />
+            <IconSymbol size={28} name="paperplane.fill" color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="transactions"
         options={{
-          title: "Ghari ja",
+          title: "Transactions",
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name="paperplane.fill" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="add-payment"
+        options={{
+          title: "Add Payment",
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="paperplane.fill" color={color} />
           ),

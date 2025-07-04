@@ -11,6 +11,7 @@ import "react-native-reanimated";
 import * as SecureStore from "expo-secure-store";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -18,16 +19,23 @@ export default function RootLayout() {
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
-  // TEMPORARY: mock auth state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
+  const [user, setUser] = useState<{ role: string } | null>(null);
   useEffect(() => {
-    // In a real app, check for token in secure storage here
     const checkAuth = async () => {
       const storedToken = await SecureStore.getItemAsync("token");
       setIsAuthenticated(!!storedToken);
     };
+
+    const getUser = async () => {
+      const storedUser = await AsyncStorage.getItem("user");
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
+    };
+
     checkAuth();
+    getUser();
   }, []);
 
   if (!loaded) return null;
@@ -37,8 +45,10 @@ export default function RootLayout() {
       <Stack screenOptions={{ headerShown: false }}>
         {!isAuthenticated ? (
           <Stack.Screen name="login" />
+        ) : user?.role === "admin" ? (
+          <Stack.Screen name="admin" />
         ) : (
-          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="users" />
         )}
         <Stack.Screen name="+not-found" />
       </Stack>

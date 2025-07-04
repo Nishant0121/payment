@@ -5,7 +5,6 @@ import {
   Alert,
   StyleSheet,
   TouchableOpacity,
-  Dimensions,
   StatusBar,
   Animated,
   KeyboardAvoidingView,
@@ -19,9 +18,6 @@ import * as SecureStore from "expo-secure-store";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
-import Constants from "expo-constants";
-
-const { width, height } = Dimensions.get("window");
 
 interface LoginResponse {
   message: string;
@@ -58,7 +54,7 @@ export default function LoginScreen() {
         useNativeDriver: true,
       }),
     ]).start();
-  }, []);
+  }, [fadeAnim, slideAnim]);
 
   const login = async () => {
     if (!username.trim() || !password.trim()) {
@@ -91,7 +87,7 @@ export default function LoginScreen() {
       await AsyncStorage.setItem("user", JSON.stringify(user));
 
       // Navigate to the tabs screen
-      router.replace("/(tabs)");
+      router.replace("/admin/dashboard");
     } catch (error) {
       const err = error as AxiosError<{ message?: string }>;
 
