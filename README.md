@@ -76,12 +76,6 @@ Uses [expo-secure-store](https://docs.expo.io/versions/latest/sdk/securestore/) 
 
 ### 📸 Screenshots
 
-![Screenshot 1](/assets/Screenshot_20250705_222027.jpg)
-![Screenshot 2](/assets/Screenshot_20250705_222032.jpg)
-![Screenshot 3](/assets/Screenshot_20250705_222017.jpg)
-![Screenshot 4](/assets/Screenshot_20250705_222002.jpg)
-![Screenshot 5](/assets/Screenshot_20250705_221756.jpg)
-
 <img src="/assets/Screenshot_20250705_222027.jpg" alt="alt text" height="100" width="150">
 <img src="/assets/Screenshot_20250705_222032.jpg" alt="alt text" height="100" width="150">
 <img src="/assets/Screenshot_20250705_222017.jpg" alt="alt text" height="100" width="150">
