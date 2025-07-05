@@ -12,6 +12,8 @@ import { TransactionItem } from "./TransactionItem";
 import { TransactionFilters } from "./TransactionFilters";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
 
 export interface Transaction {
   _id: string;
@@ -87,6 +89,48 @@ export const TransactionList = () => {
     }
   };
 
+  const exportToCSV = async (data: Transaction[]) => {
+    if (data.length === 0) return;
+
+    const csvHeaders =
+      "ID,Amount,Status,Method,Receiver,Reference ID,Timestamp\n";
+
+    const csvRows = data.map((t) => {
+      const row = [
+        t._id,
+        t.amount,
+        t.status,
+        t.method,
+        t.receiver || "",
+        t.referenceId || "",
+        t.timestamp || "",
+      ];
+      return row
+        .map((field) => `"${String(field).replace(/"/g, '""')}"`)
+        .join(",");
+    });
+
+    const csvContent = csvHeaders + csvRows.join("\n");
+
+    const fileUri = FileSystem.documentDirectory + "transactions.csv";
+
+    try {
+      await FileSystem.writeAsStringAsync(fileUri, csvContent, {
+        encoding: FileSystem.EncodingType.UTF8,
+      });
+
+      const canShare = await Sharing.isAvailableAsync();
+      if (canShare) {
+        await Sharing.shareAsync(fileUri);
+      } else {
+        alert("Sharing is not available on this device.");
+      }
+    } catch (error) {
+      console.error("Export failed:", error);
+      alert("Failed to export transactions.");
+    }
+  };
+
   const filteredData = transactions.filter((t) => {
     const statusMatch = filters.status ? t.status === filters.status : true;
     const methodMatch = filters.method ? t.method === filters.method : true;
@@ -116,7 +160,13 @@ export const TransactionList = () => {
   return (
     <View style={styles.container}>
       <TransactionFilters filters={filters} onFiltersChange={setFilters} />
-
+      <TouchableOpacity
+        style={styles.exportButton}
+        onPress={() => exportToCSV(filteredData)}
+      >
+        <Ionicons name="download-outline" size={20} color="#fff" />
+        <Text style={styles.exportButtonText}>Export CSV</Text>
+      </TouchableOpacity>
       <FlatList
         data={filteredData}
         keyExtractor={(item) => item._id}
@@ -178,5 +228,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#94a3b8",
     marginTop: 4,
+  },
+  exportButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#6366f1",
+    paddingVertical: 12,
+    borderRadius: 10,
+    marginBottom: 16,
+  },
+  exportButtonText: {
+    color: "#ffffff",
+    fontSize: 16,
+    fontWeight: "600",
+    marginLeft: 8,
   },
 });
