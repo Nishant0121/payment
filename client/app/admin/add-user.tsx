@@ -23,12 +23,12 @@ export default function AddUserScreen() {
           <View style={styles.container}>
             <ThemedView style={styles.titleContainer}>
               <ThemedText type="title" style={styles.title}>
-                Add Payment
+                Add User
               </ThemedText>
             </ThemedView>
 
             <ThemedText style={styles.subtitle}>
-              Fill out the form to create a new payment.
+              Fill out the form to create a new user.
             </ThemedText>
 
             <View style={styles.formContainer}>

@@ -1,14 +1,41 @@
-import { KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { SafeAreaFrameContext } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
-import { PaymentStatsChart } from "@/components/custom/PaymentStatsChart"; // Update path accordingly
+import { PaymentStatsChart } from "@/components/custom/PaymentStatsChart";
+import { Ionicons } from "@expo/vector-icons";
+import * as SecureStore from "expo-secure-store";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
 
 export default function PaymentStatsScreen() {
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    Alert.alert("Logout", "Are you sure you want to log out?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: async () => {
+          await SecureStore.deleteItemAsync("token");
+          await AsyncStorage.removeItem("user");
+          router.replace("/login"); // redirect to login
+        },
+      },
+    ]);
+  };
+
   return (
-    <SafeAreaFrameContext value={null}>
+    <>
       <StatusBar style="light" />
       <LinearGradient
         colors={["#667eea", "#764ba2", "#f093fb"]}
@@ -21,6 +48,14 @@ export default function PaymentStatsScreen() {
           style={styles.keyboardAvoidingView}
         >
           <View style={styles.container}>
+            {/* Logout Button */}
+            <TouchableOpacity
+              style={styles.logoutButton}
+              onPress={handleLogout}
+            >
+              <Ionicons name="log-out-outline" size={24} color="#fff" />
+            </TouchableOpacity>
+
             <ThemedView style={styles.titleContainer}>
               <ThemedText type="title" style={styles.title}>
                 Payment Insights
@@ -37,7 +72,7 @@ export default function PaymentStatsScreen() {
           </View>
         </KeyboardAvoidingView>
       </LinearGradient>
-    </SafeAreaFrameContext>
+    </>
   );
 }
 
@@ -53,8 +88,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 40,
   },
+  logoutButton: {
+    position: "absolute",
+    top: 50,
+    right: 20,
+    zIndex: 1,
+    backgroundColor: "rgba(255,255,255,0.15)",
+    padding: 10,
+    borderRadius: 50,
+  },
   titleContainer: {
     backgroundColor: "transparent",
+    marginTop: 40,
     marginBottom: 10,
     alignItems: "center",
   },
